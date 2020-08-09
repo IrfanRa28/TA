@@ -18,6 +18,9 @@ Adafruit_MAX31865 thermo = Adafruit_MAX31865(10, 11, 12, 13);
 // Nilai resistor pada sesnor saat keadaan 0 derajat Celcius 
 #define RNOMINAL  100.0
 
+float SuhuUdara = 0, TekananUdara = 0, Kelembapan = 0, SuhuAir = 0;
+
+
 void setup() {
 
   //BME280
@@ -54,27 +57,38 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
 
 void loop() {
 
-  //BME280
-  printValues();
-  delay(delayTime);
+  
+  AmbilDataBME280();
+  AmbilDataMAX31865();
+  
+  Serial.print("Suhu Air = ");
+  Serial.println(SuhuAir);
 
-  //PT100
-   //PT100
-uint16_t rtd = thermo.readRTD();
+  Serial.print("Suhu Udara = ");
+  Serial.println(SuhuUdara);
 
-  Serial.print("RTD value: "); Serial.println(rtd);
+  Serial.print("Tekanan Udara = ");
+  Serial.println(TekananUdara);
+
+  Serial.print("Kelembapan = ");
+  Serial.println(Kelembapan);
+}
+
+void AmbilDataBME280() {
+  SuhuUdara     = bme.readTemperature();
+  TekananUdara  = bme.readPressure() / 100.0F;
+  Kelembapan    = bme.readHumidity();
+}
+
+void AmbilDataMAX31865(){
+  
+  uint16_t rtd = thermo.readRTD();
+
   float ratio = rtd;
+  
   ratio /= 32768;
+  SuhuAir = thermo.temperature(RNOMINAL, RREF);
   
-  Serial.print("Ratio = "); 
-  Serial.println(ratio,8);
-  
-  Serial.print("Resistansi = "); 
-  Serial.println(RREF*ratio,8);
-  
-  Serial.print("Suhu Air = "); 
-  Serial.println(thermo.temperature(RNOMINAL, RREF));
-
   // Pengecekan Hardware
   uint8_t fault = thermo.readFault();
   if (fault) {
@@ -100,20 +114,5 @@ uint16_t rtd = thermo.readRTD();
     thermo.clearFault();
   }
   Serial.println();
-  delay(1000);
+  delay(1000); 
 }
-
-void printValues() {
-    
-    Serial.print("Suhu Udara (*C) = ");
-    Serial.println(bme.readTemperature());
-
-    Serial.print("Tekanan Udara (hPa) = ");
-    Serial.println(bme.readPressure() / 100.0F);
-    
-    Serial.print("Kelembapan (%) = ");
-    Serial.print(bme.readHumidity());
-    Serial.println();
-}
-
- 
