@@ -1,6 +1,12 @@
 //Loadcell
 #include <Q2HX711.h>
 #include <Wire.h> 
+//==========================================LCD INIT====================
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+void tampilLcd(String s1, String s2="", String s3="", String s4="");
+//==============================LCD END=================================
 //==============================hxstart=================================
 const byte hx711_data_pin = 3;    //Data pin from HX711
 const byte hx711_clock_pin = 2;   //Clock pin from HX711
@@ -43,6 +49,10 @@ float SuhuUdara = 0, TekananUdara = 0, Kelembapan = 0, SuhuAir = 0;
 
 
 void setup() {
+
+//=============================LCD===================================
+  lcd.begin();
+  lcd.backlight();
 //==============================Loacell================================
 PCICR |= (1 << PCIE0);              //enable PCMSK0 scan
   delay(2000);   //Waktu untuk menstabilkan loadcell
@@ -87,9 +97,11 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
   while(true){
     AmbilDataLoadcell();
     if (mass>400){
+      tampilLcd("tekan Start!");
       break;
     }else{
       Serial.println("Massa kurang dari 400");
+      tampilLcd("Massa Kurang");
     }
   }
     
