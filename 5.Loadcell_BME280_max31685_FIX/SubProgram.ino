@@ -74,4 +74,24 @@ void AmbilDataLoadcell(){
   mass = y1*ratio;
 
  mass -= tara;
+ //mass = (mass);
+}
+
+void Tare(){
+  tampilLcd("Tare");
+  x0=0L;
+  for (int ii=0;ii<int(avg_size);ii++){
+    delay(10);
+    x0+=hx711.read();
+  }
+  x0/=long(avg_size);
+}
+
+void Kalibrasi(){
+  tampilLcd("Kalibrasi");
+  x1 = 0L;
+  for (int jj=0;jj<int(avg_size);jj++){
+        x1+=hx711.read();
+      }
+      x1/=long(avg_size);
 }

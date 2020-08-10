@@ -20,6 +20,7 @@ int mode = 0;
 float oz_conversion = 0.035274;
 float mass, massaAwal =0;
 float y1 = 509.1; // calibrated mass to be added
+
 //=======================================end hx=============================
 
 //===============================
@@ -56,12 +57,8 @@ void setup() {
 //==============================Loacell================================
 PCICR |= (1 << PCIE0);              //enable PCMSK0 scan
   delay(2000);   //Waktu untuk menstabilkan loadcell
-// tare procedure
-  for (int ii=0;ii<int(avg_size);ii++){
-    delay(10);
-    x0+=hx711.read();
-  }
-  x0/=long(avg_size);
+
+  
 //============================EndLoacell==============================
   
   //BME280
@@ -94,22 +91,46 @@ PCICR |= (1 << PCIE0);              //enable PCMSK0 scan
 Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
 thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 3 kabel
 
+  pinMode (A0, INPUT);
+  pinMode (A3, OUTPUT);
+  digitalWrite(A3, HIGH);
+
+  Tare();
+  
   while(true){
     AmbilDataLoadcell();
-    if (mass>100){
-      tampilLcd("tekan Start!");
-      break;
-    }else{
-      Serial.println("Massa kurang dari 400");
-      tampilLcd("Massa Kurang", "Massa : " + (String)mass);
-    }
-  }
-  while(true){
-    if(!digitalRead(A2)){
+    int x = analogRead(A0);
+    if (x<5){
+      tampilLcd("Sistem Dimulai");
+      digitalWrite(A3, LOW);
       massaAwal = mass;
       break;
     }
+    else if (x<520){
+      Tare(); 
+    }
+    else if (x<700){
+      Kalibrasi();
+    }
+    else{
+      Serial.println("Massa kurang dari 400");
+      lcd.clear();
+       lcd.setCursor(5, 0);
+       lcd.print("Kalibrator");
+       lcd.setCursor(5, 1);
+       lcd.print("Rain Gauge");
+       lcd.setCursor(0, 2);
+       lcd.print("");
+       lcd.setCursor(0, 3);
+       lcd.print("Massa : " + (String)mass);
+    }
   }
+//  while(true){
+//    if(!digitalRead(A2)){
+//      massaAwal = mass;
+//      break;
+//    }
+//  }
     
 }
 
@@ -121,15 +142,28 @@ void loop() {
   AmbilDataLoadcell();
   printAll();
   float selisih = massaAwal - mass;
-  if(selisih>990){
-    //massa lebih dari 990 yang sudah netes
-    
-  }else if(selisih>660){
-    //massa lebih dari 660 yang sudah netes
-    
-  }else if(selisih>330){
-    //massa lebih dari 330 yang sudah netes
-    
+  Serial.println(selisih);
+  if(selisih>960){
+    //massa lebih dari 960 yang sudah netes
+    tampilLcd(" Kalibrasi Selesai");
+  }else if(selisih>640){
+    //massa lebih dari 640 yang sudah netes
+    int lastNow = 0;
+    while (true){
+      int Now = millis();
+      if((Now - lastNow)>3000){
+        break;
+      }
+    }
+  }else if(selisih>320){
+    //massa lebih dari 320 yang sudah netes
+    int lastNow = 0;
+    while (true){
+      int Now = millis();
+      if((Now - lastNow)>3000){
+        break;
+      }
+    }
   }
   
 }
