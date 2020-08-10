@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Strain gauge theory Arduino scale tutorial HX711</title>
+	
+<meta name="description" content="We learn how a strain gauge works, how to pass from resistance changes to voltage values and read that with an ADC and then how to use these with a load cell and create a precision homemade scale.">
+<meta charset="utf-8">
+<meta property="fb:app_id" content="249946393271">
+<meta property="og:url" content="https://www.electronoobs.com/eng_arduino_tut115.php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Strain gauge theory Arduino scale tutorial HX711">
+<meta property="og:description" content="We learn how a strain gauge works, how to pass from resistance changes to voltage values and read that with an ADC and then how to use these with a load cell and create a precision homemade scale. See more...">
+<meta property="og:image" content="http://www.electronoobs.com/images/Arduino/tut_115/tut115.jpg">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	
+<link rel="shortcut icon" href="https://electronoobs.com/images/icon.ico">
+<link rel="stylesheet" href="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/bootstrap.css">
+<link rel="stylesheet" href="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/tutorial_arduino.css">
+<script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/osd.js"></script><script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/sdk.js" async="" crossorigin="anonymous"></script><script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/cookie.js"></script><script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/show_ads_impl_fy2019.js" id="google_shimpl"></script><script id="facebook-jssdk" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/sdk_002.js"></script><script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/analytics.js"></script><script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/jquery.js"></script>
+<script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/bootstrap.js"></script>
+    
+
+
+
+
+  <script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+  <script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-7895687552151505",
+    enable_page_level_ads: true,
+    overlays: {bottom: true}
+  });
+  </script>
+  
+
+
+ 
+  
+  
+  <script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/platform.js" gapi_processed="true"></script>
+  
+  <script>window._epn = {campaign:5338106513};</script>
+  
+  <script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/epn-smart-tools.js"></script>
+  
+  <script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+  
+  
+  
+ 
+  
+  
+  
+  
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-62541190-1', 'auto');
+      ga('send', 'pageview');
+    function MM_swapImgRestore() { //v3.0
+      var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+    }
+    function MM_preloadImages() { //v3.0
+      var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+        var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+        if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+    }
+    
+    function MM_findObj(n, d) { //v4.01
+      var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+        d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+      if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+      for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+      if(!x && d.getElementById) x=d.getElementById(n); return x;
+    }
+    
+    function MM_swapImage() { //v3.0
+      var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+       if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+    }
+  </script>
+  
+  
+  
+  
+<!--  
+ <div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = 'https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.12&appId=249946393271&autoLogAppEvents=1';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+   -->
+
+
+<link rel="preload" href="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/integrator.js" as="script"><script type="text/javascript" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/integrator.js"></script><link rel="preload" href="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/integrator_002.js" as="script"><script type="text/javascript" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/integrator_002.js"></script><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}.fb_reposition{overflow:hidden;position:relative}.fb_invisible{display:none}.fb_reset{background:none;border:0;border-spacing:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}.fb_reset>div{overflow:hidden}@keyframes fb_transform{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}.fb_animate{animation:fb_transform .3s forwards}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}.fb_dialog_advanced{border-radius:8px;padding:10px}.fb_dialog_content{background:#fff;color:#373737}.fb_dialog_close_icon{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px}.fb_dialog_mobile .fb_dialog_close_icon{left:5px;right:auto;top:5px}.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}.fb_dialog_close_icon:hover{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent}.fb_dialog_close_icon:active{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent}.fb_dialog_iframe{line-height:0}.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #365899;color:#fff;font-size:14px;font-weight:bold;margin:0}.fb_dialog_content .dialog_title>span{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}body.fb_hidden{height:100%;left:0;margin:0;overflow:visible;position:absolute;top:-10000px;transform:none;width:100%}.fb_dialog.fb_dialog_mobile.loading{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}.fb_dialog.fb_dialog_mobile.loading.centered{background:none;height:auto;min-height:initial;min-width:initial;width:auto}.fb_dialog.fb_dialog_mobile.loading.centered #fb_dialog_loader_spinner{width:100%}.fb_dialog.fb_dialog_mobile.loading.centered .fb_dialog_content{background:none}.loading.centered #fb_dialog_loader_close{clear:both;color:#fff;display:block;font-size:18px;padding-top:20px}#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .4);bottom:0;left:0;min-height:100%;position:absolute;right:0;top:0;width:100%;z-index:10000}#fb-root #fb_dialog_ipad_overlay.hidden{display:none}.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}.fb_dialog_mobile .fb_dialog_iframe{position:sticky;top:0}.fb_dialog_content .dialog_header{background:linear-gradient(from(#738aba), to(#2c4987));border-bottom:1px solid;border-color:#043b87;box-shadow:white 0 1px 1px -1px inset;color:#fff;font:bold 14px Helvetica, sans-serif;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}.fb_dialog_content .dialog_header table{height:43px;width:100%}.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px}.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px}.fb_dialog_content .touchable_button{background:linear-gradient(from(#4267B2), to(#2a4887));background-clip:padding-box;border:1px solid #29487d;border-radius:3px;display:inline-block;line-height:18px;margin-top:3px;max-width:85px;padding:4px 12px;position:relative}.fb_dialog_content .dialog_header .touchable_button input{background:none;border:none;color:#fff;font:bold 12px Helvetica, sans-serif;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}.fb_dialog_content .dialog_content{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #4a4a4a;border-bottom:0;border-top:0;height:150px}.fb_dialog_content .dialog_footer{background:#f5f6f7;border:1px solid #4a4a4a;border-top-color:#ccc;height:40px}#fb_dialog_loader_close{float:left}.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}#fb_dialog_loader_spinner{animation:rotateSpinner 1.2s linear infinite;background-color:transparent;background-image:url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/t-wz8gw1xG1.png);background-position:50% 50%;background-repeat:no-repeat;height:24px;width:24px}@keyframes rotateSpinner{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}</style></head><body><div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; width: 0px; height: 0px;"><div></div></div></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0&appId=249946393271&autoLogAppEvents=1';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+  
+
+
+  
+  
+  <link rel="stylesheet" href="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+	body {	  
+	  font-size: 20px;	  
+	}
+	
+	.h1 {
+	font-size: 46px;
+	
+	}
+	h2,
+	.h2 {
+	  font-size: 30px;
+	}
+	h3,
+	.h3 {
+	  font-size: 24px;
+	}  
+  
+  	lightblue
+	{
+		font-size: 15px;
+		color:#39F;
+	}
+	
+	titleblue
+	{
+		font-size: 30px;
+		color:#06F;
+		text-align: center;
+	}
+  
+    /* Remove the navbar's default rounded borders and increase the bottom margin */ 
+    .navbar {
+      margin-bottom: 180px;
+      border-radius: 0;
+	  background-color:#FFF;
+	  color:#F90;
+    }
+	
+    
+    /* Remove the jumbotron's default bottom margin */ 
+     .jumbotron {
+      margin-bottom: 0;
+    }
+   
+    /* Add a gray background color and some padding to the footer */
+    footer {
+      background-color: #CCC;
+      padding: 25px;
+    }
+	
+	video#bgvid {
+	position: absolute;
+	top: 145px;
+	left: 50%;
+	
+	width: 99.5%;
+	height: auto;
+	z-index: -100;
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+	
+}
+
+.photo_bg
+{
+	position: absolute;
+	top: 145px;
+	left: 50%;
+	
+	width: 99.5%;
+	height: auto;
+	z-index: -100;
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+}
+
+
+
+red
+{
+	color:#F30;
+	font-size:18px;
+}
+
+p
+{
+	text-align: justify;	
+}
+
+orange
+{
+	color:#F90;
+	
+}
+
+para_footer
+{
+	text-align: center;
+	color:#967118;
+	font-size:26px;
+}
+
+.centrar_bloque
+{
+	float: left;
+	width: 100%;
+	text-align: center;
+	width: 100%;	
+}
+
+.busqueda
+{
+	left: 700px;
+	float:right;
+	
+	
+	
+	position: fixed;
+	margin-left: 10px;
+	float: left;
+	z-index: 300;
+	left: 10px;
+	bottom:30px;	
+}
+
+
+.para_code
+{
+	width: 100%;
+	height: 300px;
+	float: left;
+	overflow: scroll;
+	overflow-x: hidden;
+	text-align: left;	
+}
+
+
+
+
+
+
+
+
+
+
+
+   .navbar {
+      margin-bottom: 180px;
+      border-radius: 0;
+	  background-color:#FFF;
+	  color:#F90;
+    }
+	
+    
+    /* Remove the jumbotron's default bottom margin */ 
+     .jumbotron {
+      margin-bottom: 0;
+    }
+   
+    /* Add a gray background color and some padding to the footer */
+    footer {
+      background-color: #CCC;
+      padding: 25px;
+    }
+	
+	video#bgvid {
+	position: absolute;
+	top: 145px;
+	left: 50%;
+	
+	width: 99.5%;
+	height: auto;
+	z-index: -100;
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+	
+}
+
+.photo_bg
+{
+	position: absolute;
+	top: 145px;
+	left: 50%;
+	
+	width: 99.5%;
+	height: auto;
+	z-index: -100;
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+}
+
+
+.title_line
+{
+	background-color:#337ab7;
+	height: 5px;
+	
+}
+
+
+trending_title
+{
+	color:#F90;
+	font-size:26px;
+	background-color:#F0F0F0;
+}
+more_posts_title
+{
+	color:#F90;
+	font-size:18px;
+	background-color:#F0F0F0;
+}
+red
+{
+	color:#F30;
+	font-size:18px;
+}
+
+p
+{
+	text-align: justify;	
+}
+
+orange
+{
+	color:#F90;
+	font-size:26px;
+}
+
+small_text
+{
+	color:#003;
+	font-size:13px;
+}
+
+mobile_title
+{ 
+	font-family: Impact, Charcoal, sans-serif;
+	color: #FFF;
+	font-size: 45px;
+	text-transform: uppercase;
+	
+	background-color:#337ab7;	
+	font-weight: bolder;
+	text-align: center;
+	
+}
+div.last_tut_left_title
+{
+	color: #FFF;
+	font-size: 30px;
+	text-align: left;
+	background-color:#39C;	
+}
+
+
+div.last_tut_left_descrip
+{
+	font-size: 30px;
+	text-align: left;
+}
+
+
+para_footer
+{
+	text-align: center;
+	color:#967118;
+	font-size:26px;
+}
+
+.centrar_bloque
+{
+	float: left;
+	width: 100%;
+	text-align: center;
+	
+}
+
+.welcome_EN
+{
+	float: left;
+	width: 100%;
+	height: 40px;
+
+}
+
+.welcome_EN_1
+{
+	float: left;
+	width: 100%;
+	height: 10px;
+	margin-top:0px;
+	margin-bottom:10px;
+
+}
+
+
+.tut_title
+{
+	color: #000;
+	background-color: transparent;
+	font-size: 16px;
+	padding-left: 10px;
+	margin-bottom: 5px;
+	text-transform: none;
+	font-weight: bolder;
+	float:left;
+	width:100%;
+}
+	  
+.tut_title_by{
+	font-size: 11px;
+	float: left;
+	margin-bottom: 10px;
+}
+	  
+.tut_title_share{
+	width: 100%;
+	float: left;
+    text-align: right;	
+}
+
+.tut_title_line
+{
+	widht:100%;
+	height:5px;
+	background-color: #337ab7;	
+	margin-bottom:3px;
+	border-radius: 5px;
+	}
+
+.tut_line
+{
+	widht:100%;
+	height:5px;
+	background-color: #337ab7;	
+	margin-top:5px;
+	margin-bottom:25px;
+}
+
+link_reading
+{
+	background-color:rgba(51, 153, 204, .2);	
+	padding-left:4px;
+	padding-right:4px;
+	font-size:26px;
+	text-align:justify;
+}
+
+
+.tut_line_2
+{
+	widht:100%;
+	height:10px;
+	background-color:rgba(51, 153, 204, .2);	
+	margin-top:5px;
+	margin-bottom:25px;
+}
+.tut_text
+{
+	font-size:16px;
+	text-align: justify;	
+	line-height: initial;
+	margin-top: 10px;
+	height: 80px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	background-image: linear-gradient(to top, white, transparent);
+}
+	  
+	  
+.tut_text_overflow
+{
+	width: 92%;
+    bottom: 100px;
+    height: 30px;
+    position: absolute;
+    background-image: linear-gradient(to top, #ffffff, transparent);    
+}
+	  
+	  
+	main_title
+	  {
+		  font-size: 35px !important;
+    	  border-top: 5px solid #337ab7 !important;	 
+		  color: #337ab7 !important;
+	  }
+	  
+	  part_1{
+		  font-size: 25px !important;
+    	 border-top: 3px solid #337ab7 !important;	 
+		  color: #337ab7 !important;
+		  background-color: transparent !important;
+	  }
+	  
+	  main_top_title_back{
+		 font-size: 22px !important;	 
+	  }	  
+	  
+	  main_top_title{
+		font-size: 22px !important;	  
+	  }
+
+
+
+@media (max-width: 768px) {
+	  	main_title
+	  {
+		  font-size: 20px !important;    		  
+	  }
+	 part_1{
+		  font-size: 20px;
+    	
+	  }
+	 main_top_title_back{
+		 font-size: 16px !important;	 
+	  }	  
+	  
+	  main_top_title{
+		font-size: 16px !important;	  
+	  }
+
+}
+	  
+	  
+fecha
+{
+	font-size: 14px;
+	text-align: justify;
+	color: #09F;
+}
+
+.blog_blocks_text
+{
+	padding-top:10px;
+	float:left;
+	width:100%;
+	height:auto;
+	font-size: 20px;
+	font-weight: 300;
+	text-align: justify;
+	text-justify: inter-word;
+	color: #000;
+}
+
+
+main_top_title
+{
+	font-size: 35px;
+	background-color: #B7E8E7;
+	font-weight: bolder;
+}
+
+  </style>
+
+
+
+
+  
+<style>
+</style>  
+
+
+
+<div class="photo_bg">
+<img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/BG_GIF4.gif" width="100%" height="100%">
+</div>
+
+
+<style>
+    /* Remove the navbar's default rounded borders and increase the bottom margin */ 
+    .navbar {
+		margin-bottom: 180px;
+      	border-radius: 0;
+	  	background-color:#337ab7;
+	  	color:#FFF;
+		position: fixed;
+		float: left;
+   		width: 100%;
+    	z-index: 100;
+		top: 0;
+    }
+	
+	.navbar-inverse .navbar-toggle .icon-bar {
+  background-color: #0066CC;
+}
+
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+  background-color: #759dc0;
+  
+}
+
+red
+{
+	color:#C03;
+}
+
+#li_menu_1{
+	margin-top: 7px;
+	padding-left: 10px;
+	color: #337ab7;
+	width: 100%;
+	background-color: #fff;
+	height: 38px;
+	color: #b2b2b2;
+	font-size: 12px;
+	border: 0;
+	padding: 0 10px;
+	border-radius: 5px;
+	margin-left: 15px;		
+	}
+    
+</style>
+
+
+<nav class="navbar navbar-inverse">
+	<div class="container-fluid" style="max-width: 1600px; font-size: 14px;">	  
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar" style="border: 0;">
+				<span class="icon-bar" style="background-color: #FFF;"></span>
+				<span class="icon-bar" style="background-color: #FFF;"></span>
+				<span class="icon-bar" style="background-color: #FFF;"></span>                        
+			</button>
+			<a class="navbar-brand" href="https://electronoobs.com/index.php">HOME</a>
+		</div>
+		
+		<div class="collapse navbar-collapse" id="myNavbar">
+		
+			
+			
+	
+					
+			
+		<ul class="nav navbar-nav navbar-left" style="width: 250px;"> 
+			<li id="li_menu_1">
+				<form action="/search" method="POST">
+					<input style="border: 0; height: 38px; background-color: transparent; width: 80%;" type="text" name="search" placeholder="Search...">
+					<button style="position: absolute; top: 0; right: 0; background-color: #efefef; width: 38px; color: #337ab7;
+    				font-size: 15px; height: 100%; border: 0; border-radius: 5px;" type="submit"><i class="fas fa-search"></i></button>
+				</form>
+			</li>
+			<!--<li><a href="eng_donate.php"> <span class="glyphicon glyphicon-piggy-bank"></span> Donate</a></li>
+			<li><a href="eng_reviews.php"> <span class="glyphicon glyphicon-list-alt"></span> Reviews</a></li>
+			<li><a href="eng_advertising.php"> <span class="glyphicon glyphicon-bookmark"></span> Advertising</a></li>-->
+      	</ul>
+			
+			
+	
+			
+			
+			
+			
+			
+			
+		
+      <ul class="nav navbar-nav navbar-right">
+           
+        <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-book"></span> TUTORIALS
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="https://electronoobs.com/eng_tutoriales_arduino.php"><i class="fas fa-microchip"></i> Arduino</a></li>
+          <li><iframe style="display: none; width: 0px; height: 0px;" src="https://epnclick.ru/redirect/cpa/o/psmm3rf4havca49b2h5036s1vs0olsny/?sub=electronoobscom&amp;sub1=electronoobscom&amp;af_sub=491&amp;click_id=425108&amp;sub2=28"></iframe><a href="https://electronoobs.com/eng_tutoriales_circuitos.php"><i class="fas fa-project-diagram"></i> Circuits</a></li>
+          <li><a href="https://electronoobs.com/eng_tutoriales_robotica.php"><i class="fas fa-robot"></i> Robotics</a></li>
+        </ul>
+      </li>
+      
+     
+     
+     
+     <li><a href="https://electronoobs.com/blogs.php"> <span class="glyphicon glyphicon-th-list"></span> BLOG</a></li>
+     
+     
+     
+     <li><a target="_blank" href="https://electronoobs.io/forum"> <span class="glyphicon glyphicon-blackboard"></span>Forum</a></li>
+     
+  		
+      
+      
+      
+            
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-modal-window"></span> 3D PRINTING
+        <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="https://electronoobs.com/eng_impresoras.php">Printers</a></li>
+          <li><a href="https://electronoobs.com/eng_materiales.php">Materials</a></li>
+          <li><a href="https://electronoobs.com/eng_objetos.php">3D objects</a></li>
+          <li><a href="https://electronoobs.com/eng_edit3D.php">3D edit</a></li>
+        </ul>
+      </li>
+		  
+		  
+		<li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-piggy-bank"></i> SUPPORT
+        <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+			  <li><a href="https://electronoobs.com/eng_donate.php"> <span class="glyphicon glyphicon-piggy-bank"></span> Donate</a></li>
+				<li><a href="https://electronoobs.com/eng_reviews.php"> <span class="glyphicon glyphicon-list-alt"></span> Reviews</a></li>
+				<li><a href="https://electronoobs.com/eng_advertising.php"> <span class="glyphicon glyphicon-bookmark"></span> Advertising</a></li>
+
+			</ul>
+      	</li>
+		  
+		  
+		<li><a target="_blank" href="https://electronoobs.io/shop/"> <i class="fas fa-shopping-cart"></i> SHOP</a></li>
+      	
+		  
+		  
+		  
+					<li><a href="https://electronoobs.com/login.php"> <i class="fas fa-sign-in-alt"></i> LOGIN</a></li> 
+		  
+		  
+		  
+		 
+		
+		 
+      
+  
+      </ul>
+      
+      
+      
+      
+      
+      
+      
+    </div>
+  </div>
+</nav> 
+  
+<div class="container-fluid text-center" style="height: auto !important;">    
+<!--
+<div class="busqueda">
+    
+    <div class="search_1">
+	<div class="search_2">
+	<form method="GET" action="https://www.google.com/search">
+        <div class="search_3">
+            <i class="search_4">
+            </i>
+        <input type="hidden" name="ie" value="UTF-8">
+        <input type="hidden" name="oe" value="UTF-8">
+        <input type="text" name="q" size="25" maxlength="255" value="" placeholder="Search for any project">
+        <input type="submit" name="btnG" VALUE="search">
+        <input type="hidden" name="domains" value="https://www.electronoobs.com">
+        <input type="hidden" name="sitesearch" value="https://www.electronoobs.com">
+        </div>
+	</form> 
+	</div>
+	</div>
+</div>   
+
+<div class="youtubee">
+<div class="g-ytsubscribe" data-channelid="UCjiVhIvGmRZixSzupD0sS9Q" data-layout="full" data-onytevent="onYtEvent"></div>
+-->
+
+  
+<div class="row content" style="height: auto !important;">
+  
+
+
+
+  
+<div class="col-sm-8 col-sm-push-2 text-left"> 
+<main_title>Strain gauge + Arduino scale</main_title>  
+
+<br>
+<br>
+<div class="centrar_bloque">
+Help me by sharing this post<br>
+<div class="fb-share-button fb_iframe_widget" data-href="http://www.electronoobs.com/eng_arduino_tut115.php" data-layout="button_count" data-size="small" data-mobile-iframe="true" fb-xfbml-state="rendered" fb-iframe-plugin-query="app_id=249946393271&amp;container_width=869&amp;href=http%3A%2F%2Fwww.electronoobs.com%2Feng_arduino_tut115.php&amp;layout=button_count&amp;locale=en_US&amp;mobile_iframe=true&amp;sdk=joey&amp;size=small"><span style="vertical-align: bottom; width: 84px; height: 20px;"><iframe name="f17500aa3a574ea" data-testid="fb:share_button Facebook Social Plugin" title="fb:share_button Facebook Social Plugin" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" style="border: medium none; visibility: visible; width: 84px; height: 20px;" src="https://www.facebook.com/v3.0/plugins/share_button.php?app_id=249946393271&amp;channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Dfb1cee91d37dd2%26domain%3Delectronoobs.com%26origin%3Dhttps%253A%252F%252Felectronoobs.com%252Ff19d276921b411%26relation%3Dparent.parent&amp;container_width=869&amp;href=http%3A%2F%2Fwww.electronoobs.com%2Feng_arduino_tut115.php&amp;layout=button_count&amp;locale=en_US&amp;mobile_iframe=true&amp;sdk=joey&amp;size=small" class="" width="1000px" height="1000px" frameborder="0"></iframe></span></div>
+
+<br>
+<br>
+
+
+<main_top_title_back><a href="https://electronoobs.com/eng_arduino_tut114.php"><i class="far fa-hand-point-left"></i>PREVIOUS TUTORIAL</a></main_top_title_back>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<main_top_title><a href="https://electronoobs.com/eng_arduino_tut115_2.php">NEXT PART<i class="far fa-hand-point-right"></i></a></main_top_title>
+
+<br>
+<br>
+</div>
+
+<p>
+In this tutorial we first learn what is a strain gauge and how it works.
+ Then, sicne the gauge works with resistance variations, we learn how to
+ pass from resistance changes to voltage values. Then, using a 24bit 
+ADC, we read that voltage and in this way we can measure deforamation of
+ certain materials. Using this deformation, with a lineal curve, we pass
+ that to force and by taht to weight. So, like that we can build a 
+simple precision scale uisng the Arduino taht will read the values from 
+the 24bits ADC. Let's start.  </p>
+
+
+<div class="centrar_bloque">
+<iframe src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/LRd3W_p8PJ4.htm" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" width="100%" height="650" frameborder="0"></iframe>
+</div>
+
+<div class="clearfix"></div>
+<br>
+
+<div class="centrar_bloque">
+<div class="capa_adsense">
+<script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+<!-- Anuncio ELECTRONOOBS.com 2 Color -->
+<ins class="adsbygoogle" style="display: block; height: 350px;" data-ad-client="ca-pub-7895687552151505" data-ad-slot="2265826671" data-ad-format="auto" data-adsbygoogle-status="done"><ins id="aswift_1_expand" style="display: inline-table; border: medium none; height: 350px; margin: 0px; padding: 0px; position: relative; visibility: visible; width: 869px; background-color: transparent;"><ins id="aswift_1_anchor" style="display: block; border: medium none; height: 350px; margin: 0px; padding: 0px; position: relative; visibility: visible; width: 869px; background-color: transparent; overflow: hidden;"><iframe id="aswift_1" name="aswift_1" style="left: 0px; position: absolute; top: 0px; border: 0px none; width: 869px; height: 350px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/ads.htm" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" data-google-container-id="a!1" data-google-query-id="COrohaTAkOsCFQ7-aAodF1IB3Q" data-load-complete="true" width="869" height="350" frameborder="0"></iframe></ins></ins></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+</div></div>
+<div class="clearfix"></div>
+<br>
+<br>
+
+
+<part_1><black>PART 1 - </black>What we need</part_1>
+<br>
+<br>
+<p>
+Part list is very short. We need the Arduino that will process the data.
+ Then we need a load cell, in my case I wanted a low weight precision 
+scale so I've selected a 1Kg laod cell. In your case you could go with 
+any other. Then we need the HX711 24bits ADC to read the voltage value, 
+an LCD screen with i2c to print the weight and two push buttons.  We 
+will also need some screws, a plywood for the base and the acrilic part 
+for the top side of the scale. The rest are just wires. That's it. 
+
+
+</p><div class="centrar_bloque"> 
+<strong>We need:</strong><br>
+
+<ul class="list-group list-group-flush">
+	
+<li class="list-group-item">
+1 x Arduino NANO : <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2FMINI-USB-Nano-V3-0-ATmega328P-CH340G-5V-16M-Micro-controller-board-for-Arduino%2F381374550571%3Fhash%3Ditem58cbb1d22b%3Ag%3Aci0AAOSwNSxVAB3c" target="_blank">LINK eBay</a><br>
+</li>
+
+<li class="list-group-item">
+1 x 1Kg load cell: <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2FYZC-133-Mini-Scale-Electronic-Load-Cell-Weighing-Sensor-1-2-3-5-10-50Kg-NEW%2F172454812349%3Fhash%3Ditem28271b9abd%3Am%3AmSHT2lL8rLNtxRwVw0GIhEA" target="_blank">LINK eBay</a><br>
+</li>
+	
+<li class="list-group-item">
+1 x HX711 ADC: <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2FWeighing-Sensor-AD-Module-Dual-channel-24-bit-A-D-Conversion-HX711-Shieding-CA%2F163808830806%3Fhash%3Ditem2623c46556%3Ag%3AG5MAAOSwxs9dS7yC" target="_blank">LINK eBay</a><img style="display: none; width: 0px; height: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/_esgs4o.htm"><br>
+</li>
+	
+<li class="list-group-item">
+1 x i2c LCD: <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2FIIC-I2C-TWI-SP-I-Serial-Interface1602-16X2-Character-LCD-Module-Display-Yellow%2F252513792517%3Fhash%3Ditem3acafeb205%3Ag%3AsUQAAOSwu4BVk1Gj" target="_blank">LINK eBay</a><br>
+</li>
+	
+<li class="list-group-item">
+2 x Push button: <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2F100pcs-Micro-switch-push-button-6-6-5-mm-new-good-quality%2F400985254448%3Fhash%3Ditem5d5c956a30%3Ag%3ATDsAAOSwcu5UNir1" target="_blank">LINK eBay</a><br>
+</li>
+	
+	
+<li class="list-group-item">
+1 x acrylic 3mm: <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2F3mm-Clear-Plastic-Acrylic-Plexiglass-Perspex-Sheet-A5-Size-148mm-x-210mm%2F282029069286%3Fepid%3D1041861391%26hash%3Ditem41aa3e13e6%3Ag%3AhCIAAOSwLs5XLDUJ" target="_blank">LINK eBay</a><br>
+</li>
+
+<li class="list-group-item">
+1 x plywood: <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2FMidwest-Products-6-in-W-x-12-in-L-x-1-8-in-Plywood%2F383157335679%3Fhash%3Ditem5935f4f67f%3Ag%3Ao-0AAOSw5FRdgCPW" target="_blank">LINK eBay</a><br>
+</li>
+
+<li class="list-group-item">
+Wires: <a href="https://rover.ebay.com/rover/1/711-53200-19255-0/1?toolid=20001&amp;campid=5338106513&amp;customid=link&amp;mpre=https%3A%2F%2Fwww.ebay.com%2Fitm%2FBlack-1000ft-30AWG-Wrapping-Wire-Cable-Roll%2F261506825328%3Fhash%3Ditem3ce3057c70%3Ag%3A~nwAAOSwKfVXE3lo" target="_blank">LINK eBay</a><br>
+</li>
+
+
+</ul>
+</div>
+	
+
+
+<div class="centrar_bloque"> 
+	
+<img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/parts_1.jpg" alt="Arduino precision scale HX711 parts" width="100%" height="12%">
+</div>
+<div class="clearfix"></div>
+
+	
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+<part_1><black>PART 2 - </black>Schematic</part_1>
+<br>
+<br>
+
+<p>
+We can supply everything with 5V so don't worry. Connect GND and 5V to 
+the LCD and the HX711 ADC. Connect one side of the push buttons to GND 
+and the other side, one to D8 and the other button to D11 of the 
+Arduino. Connect data and clock for the LCD to pins A4 and A5 and also 
+data and clock from the ADC to pins D3 and D2. Connect the laod cell as 
+below, and follow the color of the wires. 
+ 	
+</p>  
+<br>
+
+<div class="centrar_bloque"> <a href="https://electronoobs.com/eng_arduino_tut115_sch1.php" target="_blank"><img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/sch_1.jpg" alt="Arduino schematic precision scale load cell HX711" width="100%" height="12%"></a>
+</div>
+
+<div class="clearfix"></div>
+
+
+<br>	
+<div class="centrar_bloque">
+<div class="capa_adsense">
+<script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+<!-- Anuncio ELECTRONOOBS.com 2 Color -->
+<ins class="adsbygoogle" style="display: block; height: 280px;" data-ad-client="ca-pub-7895687552151505" data-ad-slot="2265826671" data-ad-format="auto" data-adsbygoogle-status="done"><ins id="aswift_2_expand" style="display:inline-table;border:none;height:280px;margin:0;padding:0;position:relative;visibility:visible;width:869px;background-color:transparent;"><ins id="aswift_2_anchor" style="display:block;border:none;height:280px;margin:0;padding:0;position:relative;visibility:visible;width:869px;background-color:transparent;"></ins></ins></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+</div></div>
+<div class="clearfix"></div>
+<br>
+
+	
+	
+	
+	
+<part_1><black>PART 3.1 - </black>HX711 "raw" read example</part_1>
+<br>
+<br>
+<p>
+Ok, with the same setup in the schematic above, run the enxt code and 
+see the raw value from the HX711 ADC. You will get values from 0 to 2 
+exponential 24 because is a 24 bits. So we will have decent precision. 
+Also when the bridge is balanced, we will be in the middle value so we 
+can go both positive and negative meaning positive or negative forces on
+ the load cell. Intall the library and run the example code below then 
+open the serial monitor. 
+</p>   
+<br>
+
+<div class="tut_cod">
+<div class="tut_cod_top">
+</div>
+
+<div class="arduino_code">
+<pre><code class="arduino hljs"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <iframe style="display: none; width: 0px; height: 0px;" src="https://epnclick.ru/redirect/cpa/o/psmm3rf4havca49b2h5036s1vs0olsny/?sub=electronoobscom&amp;sub1=electronoobscom&amp;af_sub=491&amp;click_id=425108&amp;sub2=28"></iframe><span class="hljs-meta-string">&lt;Q2HX711.h&gt;</span>                              <span class="hljs-comment">//Download it here: https://electronoobs.com/eng_arduino_hx711.php</span></span>
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">byte</span> hx711_data_pin = <span class="hljs-number">3</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-keyword">byte</span> hx711_clock_pin = <span class="hljs-number">2</span>;
+Q2HX711 hx711(hx711_data_pin, hx711_clock_pin);
+<span class="hljs-keyword">void</span> <span class="hljs-built_in">setup</span>() {
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">begin</span>(<span class="hljs-number">9600</span>);
+}
+<span class="hljs-keyword">void</span> <span class="hljs-built_in">loop</span>() {
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">println</span>(hx711.<span class="hljs-built_in">read</span>()/<span class="hljs-number">100.0</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">500</span>);
+}
+</code></pre>
+</div>
+<div class="clearfloat">
+</div>
+<div class="tut_cod_bot">
+</div>
+</div>
+<div class="clearfix"></div>
+	
+	
+	
+	
+	
+	
+	
+	
+<br>
+<br>
+<br>
+	
+	
+	
+	
+<part_1><black>PART 3.2 - </black>Scale Code</part_1>
+<br>
+<br>
+<p>
+The code is quite simple. You can go below and download it and you will 
+also have links for the libraries for the LCD screen and the HX711 ADC. 
+In the code we first wait for the ADC value to cahnge a lot. That means 
+the calibration mass was placed on the scale. Then we create a loop and 
+calibrate the scale based on that calibrated mass. Change the "y1" value
+ to the value (in grams) of your calibrated mass. Then in the code, we 
+just read the value and print it on the LCD or serial monitor. We also 
+have interuptions for the two push buttons to detect when we press the 
+mode or Tara buttons. The Tara will set the scale to 0, and the mode 
+will change from g, to mm and to oz. Install the libraries, compile and 
+upload to the Arduino. Remember to change the "y1" variable you can see 
+below with the weight of your own calibrated mass. 
+</p>   
+<br>
+
+<div class="centrar_bloque"> 
+	<a href="https://electronoobs.com/eng_arduino_tut115_code1.php" target="_blank"><button type="button" style="color: #FFF;" class="btn btn-primary btn-lg">Download Scale Code <i class="fas fa-download"></i></button></a>	
+</div>
+<div class="clearfix"></div>	
+
+	<br>
+<br>
+
+	
+
+
+<link rel="stylesheet" href="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/arduino-light.css">
+<link rel="stylesheet" href="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/default.css">
+<script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/highlight.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<div class="tut_cod">
+<div class="tut_cod_top">
+</div>
+
+<div class="arduino_code">
+<pre><code class="arduino hljs"><span class="hljs-comment">//Variables</span>
+<span class="hljs-comment">/////////Change here with your calibrated mass////////////</span>
+<span class="hljs-keyword">float</span> y1 = <span class="hljs-number">2831.0</span>; <span class="hljs-comment">// calibrated mass to be added</span>
+<span class="hljs-comment">//////////////////////////////////////////////////////////</span>
+
+<span class="hljs-keyword">long</span> x1 = <span class="hljs-number">0</span>L;
+<span class="hljs-keyword">long</span> x0 = <span class="hljs-number">0</span>L;
+<span class="hljs-keyword">float</span> avg_size = <span class="hljs-number">10.0</span>; <span class="hljs-comment">// amount of averages for each mass measurement</span>
+<span class="hljs-keyword">float</span> tara = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">bool</span> tara_pushed = false;
+<span class="hljs-keyword">bool</span> mode_pushed = false;
+<span class="hljs-keyword">int</span> mode = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">float</span> oz_conversion = <span class="hljs-number">0.035274</span>;
+<span class="hljs-comment">//////////////////////////////////////////////////////////</span>
+</code></pre>
+</div>
+<div class="clearfloat">
+</div>
+<div class="tut_cod_bot">
+</div>
+</div>
+<div class="clearfix"></div>
+
+
+
+	
+	
+	
+	
+<br>	
+<br>
+<br>
+<br>
+	
+	
+	
+	
+	
+<part_1><black>PART 4- </black>Mount the scale</part_1>
+<br>
+<br>
+<p>
+As you can see below, the setup is easy. First screw the load cell in 
+palce. I add two screw nuts so it will have clearance from the ground so
+ it will be able to flex. Then I screw that to the plywood and on top I 
+add the acrylic. Connect the wires as in the scheamtic. Add the push 
+buttons and I glue everything on the plywood board. Upload the code, 
+after the "add calibrated mass" message add your mass, and the scale 
+will be ready. I supply my setup with the USB cable. 
+</p>   
+<br>
+	
+<div class="centrar_bloque"> <img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/mount_1.jpg" alt="Arduino load cell precision scale tutorial" width="100%" height="12%">
+</div>
+
+<div class="clearfix"></div>
+	<br>
+<br>
+<br>
+
+	
+
+
+
+
+
+<div class="centrar_bloque">
+<br>
+<br>
+
+<main_top_title_back><a href="https://electronoobs.com/eng_arduino_tut114.php"><i class="far fa-hand-point-left"></i>PREVIOUS TUTORIAL</a></main_top_title_back>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<main_top_title><a href="https://electronoobs.com/eng_arduino_tut115_2.php">NEXT PART<i class="far fa-hand-point-right"></i></a></main_top_title>
+
+</div>
+
+
+
+
+
+<div class="clearfix"></div>
+<br>
+
+
+
+
+<div class="centrar_bloque">
+Help me by sharing this post<br>
+<div class="fb-share-button fb_iframe_widget" data-href="http://www.electronoobs.com/eng_arduino_tut115.php" data-layout="button_count" data-size="small" data-mobile-iframe="true" fb-xfbml-state="rendered" fb-iframe-plugin-query="app_id=249946393271&amp;container_width=869&amp;href=http%3A%2F%2Fwww.electronoobs.com%2Feng_arduino_tut115.php&amp;layout=button_count&amp;locale=en_US&amp;mobile_iframe=true&amp;sdk=joey&amp;size=small"><span style="vertical-align: bottom; width: 84px; height: 20px;"><iframe name="ff00198c64b048" data-testid="fb:share_button Facebook Social Plugin" title="fb:share_button Facebook Social Plugin" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" style="border: medium none; visibility: visible; width: 84px; height: 20px;" src="https://www.facebook.com/v3.0/plugins/share_button.php?app_id=249946393271&amp;channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Df1530898f5e3a16%26domain%3Delectronoobs.com%26origin%3Dhttps%253A%252F%252Felectronoobs.com%252Ff19d276921b411%26relation%3Dparent.parent&amp;container_width=869&amp;href=http%3A%2F%2Fwww.electronoobs.com%2Feng_arduino_tut115.php&amp;layout=button_count&amp;locale=en_US&amp;mobile_iframe=true&amp;sdk=joey&amp;size=small" class="" width="1000px" height="1000px" frameborder="0"></iframe></span></div>
+
+
+
+
+<br>
+<br>
+<div class="fb-comments fb_iframe_widget fb_iframe_widget_fluid_desktop" data-href="http://www.electronoobs.com/eng_arduino_tut115.php" data-width="100%" data-numposts="5" style="width: 100%;" fb-xfbml-state="rendered" fb-iframe-plugin-query="app_id=249946393271&amp;container_width=869&amp;height=100&amp;href=http%3A%2F%2Fwww.electronoobs.com%2Feng_arduino_tut115.php&amp;locale=en_US&amp;numposts=5&amp;sdk=joey&amp;version=v3.0&amp;width="><span style="vertical-align: bottom; width: 100%; height: 398px;"><iframe name="f1c1e44fb45f212" data-testid="fb:comments Facebook Social Plugin" title="fb:comments Facebook Social Plugin" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" style="border: medium none; visibility: visible; width: 100%; height: 398px;" src="https://www.facebook.com/v3.0/plugins/comments.php?app_id=249946393271&amp;channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Df10ed044318282e%26domain%3Delectronoobs.com%26origin%3Dhttps%253A%252F%252Felectronoobs.com%252Ff19d276921b411%26relation%3Dparent.parent&amp;container_width=869&amp;height=100&amp;href=http%3A%2F%2Fwww.electronoobs.com%2Feng_arduino_tut115.php&amp;locale=en_US&amp;numposts=5&amp;sdk=joey&amp;version=v3.0&amp;width=" class="" width="1000px" height="100px" frameborder="0"></iframe></span></div>
+<br>
+<br>
+
+
+
+</div>
+<div class="clearfix"></div>
+<br>
+<br>
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+</div>
+ 
+ 
+ 
+ 
+ 
+<div class="col-sm-2 col-sm-pull-8 sidenav"> 
+<style>
+.barra_social_media_10{
+	height: 60px;
+	float: center;
+	width: 100%;
+	background-color:#FFF;
+	}
+
+.barra_social_media_2{
+	margin:2%;
+	height: 50px;
+	float: left;
+	width: 50px;
+	
+}
+.barra_social_media_3{
+	margin-right:2%;
+	margin-bottom:2%;
+	margin-top:2%;
+	margin-left:4%;
+	height: 50px;
+	float: left;
+	width: 50px;
+	background-color: none;
+}
+
+.gearbest_side_1
+{
+  float:left;
+  width:100%;
+  height:600px;
+  float: center;
+  margin-bottom:10px;
+  margin-top:10px;
+}
+
+.gearbest_horizontal_1
+{
+  float:center;
+  width: 100%;
+  height:90px;
+  margin-bottom:10px;
+  margin-top:10px;
+
+}
+
+.ad_line
+{
+  float:center;
+  width: 100%;
+  height:20px;
+  border-bottom: 1px dotted #FC9;
+  
+ 
+}
+</style>    
+    
+    
+    
+    
+    
+    
+    
+    
+      <div class="barra_social_media_10">
+      
+      	<div class="barra_social_media_3">
+        <a href="https://www.youtube.com/c/ELECTRONOOBS" target="_blank" onmouseover="MM_swapImage('yt_link','','images/YouTube_2.png',1)" onmouseout="MM_swapImgRestore()"><img id="yt_link" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/YouTube_1.png" alt="yt_link" width="50px"></a> 
+        </div>
+        
+        <div class="barra_social_media_2">
+        <a href="https://www.instagram.com/ELECTRONOOBS" target="_blank" onmouseover="MM_swapImage('insta_link','','images/Insta_2.png',1)" onmouseout="MM_swapImgRestore()"><img id="insta_link" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/Insta_1.png" alt="insta_link" width="50px"></a> 
+        </div>
+        
+        <div class="barra_social_media_2">
+        <img style="display: none; width: 0px; height: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/_esgs4o.htm"><a href="https://www.facebook.com/Electronoobs" target="_blank" onmouseover="MM_swapImage('fb_link','','images/fb_2.png',1)" onmouseout="MM_swapImgRestore()"><img id="fb_link" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/fb_1.png" alt="fb_link" width="50px"></a>
+        </div>
+        
+        <div class="barra_social_media_2">
+        <a href="https://twitter.com/ELECTRONOOBS" target="_blank" onmouseover="MM_swapImage('twitter_link','','images/twitter_2.png',1)" onmouseout="MM_swapImgRestore()"><img id="twitter_link" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/twitter_1.png" alt="twitter_link" width="50px"></a>
+        </div>
+    </div>
+      
+      
+      
+        
+  
+<h3><orange>Also see Wheatstone Bridge Theory
+<br>
+
+
+<iframe src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/ZqAM_wQ35ow.htm" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" width="100%" height="210" frameborder="0"></iframe>
+	
+<br>
+<style>
+.adsense_side_bloc_1
+{
+	width:100%;
+	height:250px;
+	
+	margin-bottom:10px;
+}
+
+.adsense_side_bloc_1_280
+{
+	width:100%;
+	height:280px;
+	
+	margin-bottom:10px;
+}
+
+.adsense_side_bloc_2
+{
+	width:100%;
+	height:600px;
+	
+	margin-bottom:10px;
+}
+
+.adsense_side_bloc_3
+{
+	width:100%;
+	height:600px;
+	
+	margin-bottom:10px;
+}
+
+
+.adsense_side_bloc_total
+{
+	
+	float:center;
+	
+}
+
+
+
+</style>
+
+
+<div class="adsense_side_bloc_total">
+<br>
+
+
+
+
+<!--<div class="adsense_side_bloc_1">
+<a href="http://bit.ly/2OZXUOa" target="_blank"><img src="images/Advertising/PCBWAY/Solo_banner.gif" width="100%" height="280" alt="PCBWAY PCB Manufacturing" /></a>
+</div>
+
+
+<br />
+
+
+
+<div class="adsense_side_bloc_1">
+<a href="http://bit.ly/2C13Rpp" target="_blank"><img src="images/Advertising/PCBWAY/PCBway_2019_1.gif" width="100%" height="280" alt="PCBWAY Christas PCB Manufacturing" /></a>
+</div>
+
+
+<br />
+
+
+<div class="adsense_side_bloc_1_280">
+<a href="http://bit.ly/2BdX0tU" target="_blank"><img src="images/Advertising/welpcb_ad_2.gif" width="100%" height="280" alt="Advanced PCB Manufacturing" /></a>
+</div>
+
+
+<div class="adsense_side_bloc_1_280">
+<a href="http://bit.ly/2LeoDq1" target="_blank"><img src="images/Advertising/welpcb_ad_3.gif" width="100%" height="280" alt="Advanced PCB Manufacturing" /></a>
+</div>-->
+
+
+
+
+<div class="clearfix">
+</div>
+
+
+
+
+
+
+<div class="adsense_side_bloc_2">
+<script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+<!-- Personalizado -->
+<ins class="adsbygoogle" style="display:inline-block;width:247px;height:600px" data-ad-client="ca-pub-7895687552151505" data-ad-slot="4203471416" data-adsbygoogle-status="done"><ins id="aswift_3_expand" style="display:inline-table;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:247px;background-color:transparent;"><ins id="aswift_3_anchor" style="display:block;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:247px;background-color:transparent;"><iframe id="aswift_3" name="aswift_3" style="left:0;position:absolute;top:0;border:0;width:247px;height:600px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/ads.htm" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" data-google-container-id="a!3" data-google-query-id="CNeaiKTAkOsCFQoQ1QodoZcI-Q" data-load-complete="true" width="247" height="600" frameborder="0"></iframe></ins></ins></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+
+
+
+<div class="clearfix"></div>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+<div class="clearfix"></div></orange></h3></div>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+    
+    
+    <div class="col-sm-2 sidenav" style="height: auto !important; min-height: 0px !important;">
+    
+      <div class="well" style="height: auto !important; min-height: 0px !important;">
+       <style>
+	.right_well{
+		float: left;		
+		width: 100%;
+		font-size: 14px;
+		background-color: #fff;
+		border-top: 5px solid #337ab7;
+		border-left: 1px solid #e4e4e4;
+		border-right: 1px solid #e4e4e4;
+		border-bottom: 1px solid #e4e4e4;
+		margin-bottom: 20px;
+		-webkit-box-shadow: 1px 0px 2px rgba(0,0,0,0.24);
+		-moz-box-shadow: 1px 0px 2px rgba(0,0,0,0.24);
+		-ms-box-shadow: 1px 0px 2px rgba(0,0,0,0.24);
+		-o-box-shadow: 1px 0px 2px rgba(0,0,0,0.24);
+		box-shadow: 1px 0px 2px rgba(0,0,0,0.24);	
+		color: #000;
+	 }
+	
+	@media screen and (min-width:767px){
+		.stickye_R {
+			float: left;
+			position: fixed;
+			top: 65px;				
+		}	
+	}
+	
+	.right_bar
+	{
+		/*float: left;*/
+		width: 100%;	
+		padding-bottom: 20px;
+		height: 100%;
+		border-top: 5px solid #337ab7;
+		padding-top: 5px;
+		
+		
+	}
+	
+	#navebar_R
+	{
+		width: 100%;
+	}
+	
+	
+</style>
+ 
+	
+	
+<script>
+	
+window.onscroll = function() {myFunction4();
+							  myFunction3();
+							 
+							 
+							 
+							 };
+
+function myFunction4(){
+	var x_R = $('#right_bar').outerHeight() + 180;
+	var sidebar_width_R = $('#right_bar').outerWidth() ;
+	var sidebar_height_R = $( window ).outerHeight() * 0.9;
+
+	
+	if(window.pageYOffset >= x_R) {
+		navebar_R.classList.add('stickye_R');
+		navebar_R.style.width = (sidebar_width_R + "px");
+		navebar_R.style.height = sidebar_height_R;
+	}
+	else{
+		navebar_R.classList.remove('stickye_R');
+	}
+}
+</script>
+
+
+<div class="right_bar" id="right_bar" style="height: auto !important;">
+	<div class="adsense_side_bloc_1_280">
+		<a href="http://bit.ly/36FgSDm" target="_blank"><img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/300x250_Anniversary.jpg" alt="PCBWAY PCB service" width="95%" height="100%"></a>
+	</div>
+	<div class="clearfix"></div>
+	<br>
+	
+	<div class="adsense_side_bloc_1_280">
+		<a href="http://bit.ly/2sZR6Lu" target="_blank"><img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/336x280.jpg" alt="PCBWAY PCB service" width="95%" height="100%"></a>
+	</div>
+	<div class="clearfix"></div>
+	<br>
+	
+	<div class="adsense_side_bloc_1_280">
+		<a href="https://bit.ly/2ZqxdLa" target="_blank"><img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/500x500.gif" alt="PCBONLINE PCB service" width="95%" height="100%"></a>
+	</div>	
+	<div class="clearfix"></div>
+	<br>
+
+	<div class="adsense_side_bloc_1_280">
+		  <div id="ali-banner"><img style="cursor: pointer;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/7.jfif"><span></span></div>
+			<style scoped="">
+				#ali-banner img{
+					width: 100%;
+				}
+			</style>
+		
+            <script type="text/javascript">
+            (function (d, w, p, q, i) {
+              var s = d.createElement('script');
+              var f = q.replace('#', '');
+			  
+				 		  
+				
+              s.src = '//' + p + '/s?d=' + i + '&f=' + f + '&r=' + new Date().getTime();			
+              s.onload = function () {
+                typeof w[f] === 'function' && w[f](p, q, d, i)
+              };
+				
+			 
+				
+              d.body.appendChild(s);
+            })(document, window, 'aliadvert.ru', '#ali-banner', 839)
+            </script>
+
+	</div>	
+	<div class="clearfix"></div>
+	<br>
+		
+	
+	<div class="adsense_side_bloc_2">
+		<script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+		<!-- Left Sidebar block 1 -->
+		<ins class="adsbygoogle" style="display: block; height: 662px;" data-ad-client="ca-pub-7895687552151505" data-ad-slot="3574796316" data-ad-format="auto" data-full-width-responsive="true" data-adsbygoogle-status="done"><ins id="aswift_4_expand" style="display: inline-table; border: medium none; height: 662px; margin: 0px; padding: 0px; position: relative; visibility: visible; width: 189px; background-color: transparent;"><ins id="aswift_4_anchor" style="display: block; border: medium none; height: 662px; margin: 0px; padding: 0px; position: relative; visibility: visible; width: 189px; background-color: transparent; overflow: hidden;"><iframe id="aswift_4" name="aswift_4" style="left: 0px; position: absolute; top: 0px; border: 0px none; width: 189px; height: 662px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/ads.htm" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" data-google-container-id="a!4" data-google-query-id="COyyiaTAkOsCFaeCrAIdEbwJGw" data-load-complete="true" width="189" height="662" frameborder="0"></iframe></ins></ins></ins>
+		<script>
+			 (adsbygoogle = window.adsbygoogle || []).push({});
+		</script>	
+	</div>
+	<div class="clearfix"></div>
+	<br>
+	
+	
+	
+	<div class="adsense_side_bloc_1_280">
+		<a href="https://s.click.aliexpress.com/e/_dUqM4uX?bz=300*250" target="_parent"><img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/Had93e0a03ab54bca81b36c7da4a2bf44Y.gif" width="100%" height="250"></a>
+	</div>	
+	<div class="clearfix"></div>
+	<br>
+	
+	<div class="adsense_side_bloc_1_280">
+		<a href="https://s.click.aliexpress.com/e/_BfZ4HgEb?bz=190*240" target="_parent"><img src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/H135d21cbaf0a4551ac0e4a5f08530654P.webp" width="100%" height="250"></a>
+	</div>	
+	<div class="clearfix"></div>
+	<br>
+	
+	
+	
+	
+	
+	<div class="adsense_side_bloc_2">
+		<script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+		<!-- Sidebar_cuadrado -->
+		<ins class="adsbygoogle" style="display: inline-block; width: 206px; height: 280px;" data-ad-client="ca-pub-7895687552151505" data-ad-slot="2872239064" data-adsbygoogle-status="done"><ins id="aswift_5_expand" style="display:inline-table;border:none;height:280px;margin:0;padding:0;position:relative;visibility:visible;width:206px;background-color:transparent;"><ins id="aswift_5_anchor" style="display:block;border:none;height:280px;margin:0;padding:0;position:relative;visibility:visible;width:206px;background-color:transparent;"></ins></ins></ins>
+		<script>
+			 (adsbygoogle = window.adsbygoogle || []).push({});
+		</script>	
+	</div>
+	<div class="clearfix"></div>
+	<br>
+	
+	
+	
+	
+	
+	
+	
+	
+
+</div> 		
+	
+<div id="navebar_R" class="" style="float: left;">
+	<div class="right_well">
+		<div class="adsense_side_bloc_2">
+		<script async="" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/adsbygoogle.js"></script>
+		<!-- Left Sidebar block 1 -->
+		<ins class="adsbygoogle" style="display: block; height: 600px;" data-ad-client="ca-pub-7895687552151505" data-ad-slot="3574796316" data-ad-format="auto" data-full-width-responsive="true" data-adsbygoogle-status="done"><ins id="aswift_6_expand" style="display:inline-table;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:187px;background-color:transparent;"><ins id="aswift_6_anchor" style="display:block;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:187px;background-color:transparent;"></ins></ins></ins>
+		<script>
+			 (adsbygoogle = window.adsbygoogle || []).push({});
+		</script>	
+		</div>
+		<div class="clearfix">
+		</div>
+	</div>
+</div>	
+
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+      
+      <div class="well">
+       
+<iframe src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/Vep09UZsuiQ.htm" allow="autoplay; encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe>
+
+<br>
+<br>
+
+<iframe src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/kMU8xiGCpd0.htm" allow="autoplay; encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe>      </div>      
+    </div>
+
+
+
+  </div>
+</div><script src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/s"></script>
+
+
+
+
+
+
+
+
+
+
+
+<footer class="container-fluid text-center">
+  <para_footer>ELECTRONOOBS 2020
+<br>
+
+Keep up you guys!</para_footer>  
+  
+</footer>
+
+
+
+<img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_008.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_003.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_004.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_006.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_002.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_009.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_007.gif"><img style="text-decoration: none; border: 0px none; padding: 0px; margin: 0px;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/1_005.gif"><ins class="adsbygoogle adsbygoogle-noablate" style="display: none !important;" data-adsbygoogle-status="done"><ins id="aswift_0_expand" style="display:inline-table;border:none;height:0px;margin:0;padding:0;position:relative;visibility:visible;width:0px;background-color:transparent;"><ins id="aswift_0_anchor" style="display:block;border:none;height:0px;margin:0;padding:0;position:relative;visibility:visible;width:0px;background-color:transparent;"><iframe id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;border:0;width:undefinedpx;height:undefinedpx;" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/ads_004.htm" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" data-google-container-id="a!0" data-load-complete="true" frameborder="0"></iframe></ins></ins></ins><iframe id="google_osd_static_frame_592431713243" name="google_osd_static_frame" style="display: none; width: 0px; height: 0px;"></iframe></body><iframe id="google_esf" name="google_esf" src="Strain%20gauge%20theory%20Arduino%20scale%20tutorial%20HX711_files/zrt_lookup.htm" style="display: none;" data-ad-client="ca-pub-7895687552151505"></iframe><iframe style="display: none;" src="https://pagead2.googlesyndication.com/pagead/gen_204?id=rmvasftr&amp;type=false"></iframe></html>
