@@ -13,6 +13,8 @@ void printAll(){
 
   Serial.print("Massa = ");
   Serial.println(mass);
+
+  tampilLcd((String)SuhuAir+" C - " + (String)SuhuUdara + " C", (String)TekananUdara + " hPa "+ (String)Kelembapan+" %", (String)mass+" gram");
 }
 void AmbilDataBME280() {
   SuhuUdara     = bme.readTemperature();
@@ -54,7 +56,7 @@ void AmbilDataMAX31865(){
     thermo.clearFault();
   }
   Serial.println();
-  delay(1000); 
+//  delay(1000); 
 }
 
 void AmbilDataLoadcell(){

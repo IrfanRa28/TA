@@ -12,9 +12,9 @@ const byte hx711_data_pin = 3;    //Data pin from HX711
 const byte hx711_clock_pin = 2;   //Clock pin from HX711
 Q2HX711 hx711(hx711_data_pin, hx711_clock_pin); // prep hx711
 
-long x1 = 8795297;//0L;
+long x1 = 8787168;//0L;
 long x0 = 0L;
-float avg_size = 15.0; // amount of averages for each mass measurement
+float avg_size = 4.0; // amount of averages for each mass measurement
 float tara = 0;
 int mode = 0;
 float oz_conversion = 0.035274;
@@ -96,12 +96,12 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
 
   while(true){
     AmbilDataLoadcell();
-    if (mass>400){
+    if (mass>100){
       tampilLcd("tekan Start!");
       break;
     }else{
       Serial.println("Massa kurang dari 400");
-      tampilLcd("Massa Kurang");
+      tampilLcd("Massa Kurang", "Massa : " + (String)mass);
     }
   }
   while(true){

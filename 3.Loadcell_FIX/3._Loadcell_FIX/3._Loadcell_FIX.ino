@@ -23,7 +23,7 @@ Q2HX711 hx711(hx711_data_pin, hx711_clock_pin); // prep hx711
 float y1 = 509.1; // calibrated mass to be added
 //////////////////////////////////////////////////////////
 
-long x1 = 8795297;//0L;
+long x1 = 0L;//0L;
 long x0 = 0L;
 float avg_size = 15.0; // amount of averages for each mass measurement
 float tara = 0;
@@ -43,7 +43,7 @@ void setup() {
   pinMode(tara_button, INPUT_PULLUP);
   pinMode(mode_button, INPUT_PULLUP);
 
-  lcd.init();                         //Init the LCD
+  lcd.begin();                         //Init the LCD
   lcd.backlight();                    //Activate backlight 
   
   delay(3000);                        // allow load cell and hx711 to settle
@@ -63,24 +63,25 @@ void setup() {
   lcd.print("      Mass      ");
   // calibration procedure (mass should be added equal to y1)
   int ii = 1;
-//  while(true){
-//    float baca = hx711.read();
-//    if (baca<x0+10000)
-//    {
-//      //do nothing...
-//    } 
-//    else 
-//    {
-//      ii++;
-//      delay(2000);
-//      for (int jj=0;jj<int(avg_size);jj++){
-//        x1+=hx711.read();
-//      }
-//      x1/=long(avg_size);
-//      delay(10000);
-//      break;
-//    }
-//  }
+  while(true){
+    float baca = hx711.read();
+    Serial.println(baca);
+    if (baca<x0+10000)
+    {
+      //do nothing...
+    } 
+    else 
+    {
+      ii++;
+      delay(2000);
+      for (int jj=0;jj<int(avg_size);jj++){
+        x1+=hx711.read();
+      }
+      x1/=long(avg_size);
+      delay(10000);
+      break;
+    }
+  }
   Serial.println("Calibration Complete");
   lcd.clear();
   lcd.setCursor(0,0);

@@ -43,7 +43,7 @@ void setup() {
   pinMode(tara_button, INPUT_PULLUP);
   pinMode(mode_button, INPUT_PULLUP);
 
-  lcd.init();                         //Init the LCD
+  lcd.begin();                         //Init the LCD
   lcd.backlight();                    //Activate backlight 
   
   delay(3000);                        // allow load cell and hx711 to settle
