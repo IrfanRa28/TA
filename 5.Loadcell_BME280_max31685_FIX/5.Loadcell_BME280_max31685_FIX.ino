@@ -18,8 +18,21 @@ float avg_size = 4.0; // amount of averages for each mass measurement
 float tara = 0;
 int mode = 0;
 float oz_conversion = 0.035274;
-float mass, massaAwal =0;
+float mass; 
+float massaAwal =0;
 float y1 = 509.1; // calibrated mass to be added
+
+int jmlhJungkitan = 0; //Jumlah Jungkitan
+int hal = 0;
+
+int n = 0;
+float sumTudara = 0, sumTair = 0, sumP = 0, sumRH = 0;
+int lsNow = 0;
+float rata2TU = 0;
+float rata2TA = 0;
+float rata2PU = 0;
+float rata2RH = 0;
+bool Running = false;
 
 //=======================================end hx=============================
 
@@ -92,6 +105,7 @@ Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
 thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 3 kabel
 
   pinMode (A0, INPUT);
+  pinMode (A1, INPUT);
   pinMode (A3, OUTPUT);
   digitalWrite(A3, HIGH);
 
@@ -102,6 +116,7 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
     int x = analogRead(A0);
     if (x<5){
       tampilLcd("Sistem Dimulai");
+      Running = true;
       digitalWrite(A3, LOW);
       massaAwal = mass;
       break;
@@ -125,12 +140,7 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
        lcd.print("Massa : " + (String)mass);
     }
   }
-//  while(true){
-//    if(!digitalRead(A2)){
-//      massaAwal = mass;
-//      break;
-//    }
-//  }
+
     
 }
 
@@ -140,30 +150,11 @@ void loop() {
   AmbilDataBME280();
   AmbilDataMAX31865();
   AmbilDataLoadcell();
+  PengaturanAliran();
+  RecordSum();
+  //ReedSwitch();
   printAll();
-  float selisih = massaAwal - mass;
-  Serial.println(selisih);
-  if(selisih>960){
-    //massa lebih dari 960 yang sudah netes
-    tampilLcd(" Kalibrasi Selesai");
-  }else if(selisih>640){
-    //massa lebih dari 640 yang sudah netes
-    int lastNow = 0;
-    while (true){
-      int Now = millis();
-      if((Now - lastNow)>3000){
-        break;
-      }
-    }
-  }else if(selisih>320){
-    //massa lebih dari 320 yang sudah netes
-    int lastNow = 0;
-    while (true){
-      int Now = millis();
-      if((Now - lastNow)>3000){
-        break;
-      }
-    }
-  }
+
+  
   
 }

@@ -1,4 +1,15 @@
 void printAll(){
+  int x = analogRead(A0);
+    if(x>700 && x<800){
+      tampilLcd("", "", "    Loading...");
+      if(hal>=2){
+        hal = 0;
+      }
+      else{
+        hal++;
+      }
+      delay(500);
+    }
   Serial.print("Suhu Air = ");
   Serial.println(SuhuAir);
 
@@ -14,7 +25,31 @@ void printAll(){
   Serial.print("Massa = ");
   Serial.println(mass);
 
-  tampilLcd((String)SuhuAir+" C - " + (String)SuhuUdara + " C", (String)TekananUdara + " hPa "+ (String)Kelembapan+" %", (String)mass+" gram");
+  switch(hal){
+    case 0:
+      tampilLcd((String)SuhuAir+" C - " + (String)SuhuUdara + " C", (String)TekananUdara + " hPa ", (String)Kelembapan+" %", (String)mass+" gram");
+      break;
+
+    case 1:
+      tampilLcd("Jumlah Jungkit : "+(String)jmlhJungkitan, "Baris 2");
+      break;
+
+    case 2:
+      rata2TU = (float)sumTudara/n;
+      if(mass>730){
+        rata2TA = (float)sumTair/n;
+      }
+      rata2PU = (float)sumP/n;
+      rata2RH = (float)sumRH/n;
+      tampilLcd((String) rata2TU, (String) rata2TA, (String) rata2PU, (String) rata2RH);
+      break;
+  }
+//  if (hal==0){
+//    tampilLcd((String)SuhuAir+" C - " + (String)SuhuUdara + " C", (String)TekananUdara + " hPa ", (String)Kelembapan+" %", (String)mass+" gram");
+//  }
+//  else{
+//    tampilLcd("Jumlah Jungkit : "+(String)n, "Baris 2");
+//  }
 }
 void AmbilDataBME280() {
   SuhuUdara     = bme.readTemperature();
@@ -74,7 +109,7 @@ void AmbilDataLoadcell(){
   mass = y1*ratio;
 
  mass -= tara;
- //mass = (mass);
+ mass = abs(mass);
 }
 
 void Tare(){
@@ -94,4 +129,65 @@ void Kalibrasi(){
         x1+=hx711.read();
       }
       x1/=long(avg_size);
+}
+
+void ReedSwitch(){
+  int RS = digitalRead(A1);
+
+  if(RS==0){
+    delay(3000);
+    jmlhJungkitan++;
+    Serial.println(jmlhJungkitan);
+  }
+}
+
+void PengaturanAliran(){
+  float selisih = massaAwal - mass;
+  Serial.println(selisih);
+  if(selisih>960){
+    //massa lebih dari 960 yang sudah netes
+    tampilLcd(" Kalibrasi Selesai");
+    Running = false;
+    digitalWrite(A3, HIGH);
+  }else if(selisih>640){
+    digitalWrite(A3, HIGH);
+    //massa lebih dari 640 yang sudah netes
+    int lastNow = 0;
+    while (true){
+      int Now = millis();
+      if((Now - lastNow)>3000){
+        digitalWrite(A3, LOW);
+        break;
+      }
+    }
+  }else if(selisih>320){
+    //massa lebih dari 320 yang sudah netes
+    digitalWrite(A3, HIGH);
+    int lastNow = 0;
+    while (true){
+      int Now = millis();
+      if((Now - lastNow)>3000){
+        digitalWrite(A3, LOW);
+        break;
+      }
+    }
+  }
+}
+
+void RecordSum(){
+  int Nw = millis();
+  if((Nw-lsNow)<0){
+    lsNow = Nw;
+  }
+  else if((Nw - lsNow)>1000){
+    lsNow = Nw;
+    if(Running){
+      sumTudara += SuhuUdara;
+      sumTair += SuhuAir;
+      sumP += TekananUdara;
+      sumRH += Kelembapan;
+      n++;
+    }
+    
+  }
 }
