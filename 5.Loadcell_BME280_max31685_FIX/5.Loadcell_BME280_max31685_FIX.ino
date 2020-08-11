@@ -1,3 +1,6 @@
+//EEPROM Untuk Menyimpan x1 kalibrasi
+#include <EEPROM.h>
+
 //Loadcell
 #include <Q2HX711.h>
 #include <Wire.h> 
@@ -34,6 +37,11 @@ float rata2PU = 0;
 float rata2RH = 0;
 bool Running = false;
 
+struct MyObject {
+  long x1; 
+};
+
+int alamatx1 = 0;
 //=======================================end hx=============================
 
 //===============================
@@ -109,7 +117,11 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
   pinMode (A3, OUTPUT);
   digitalWrite(A3, HIGH);
 
+  alamatx1 += sizeof(long);
+  MyObject customVar;
+  EEPROM.get(alamatx1, customVar);
   Tare();
+  x1 = customVar.x1;
   
   while(true){
     AmbilDataLoadcell();

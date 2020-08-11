@@ -128,7 +128,13 @@ void Kalibrasi(){
   for (int jj=0;jj<int(avg_size);jj++){
         x1+=hx711.read();
       }
-      x1/=long(avg_size);
+  x1/=long(avg_size);
+  tampilLcd("Kalibrasi Selesai", "x1 = "+(String)x1);
+  MyObject customVar = {
+    x1
+  };
+  EEPROM.put(alamatx1, customVar);
+  delay(3000);
 }
 
 void ReedSwitch(){
