@@ -1,19 +1,20 @@
-//=======================EEPROM Untuk Menyimpan x1 kalibrasi==============
+//EEPROM Untuk Menyimpan x1 kalibrasi
 #include <EEPROM.h>
 
-//=======================Iniasiai Loadcell================================
+//Loadcell
 #include <Q2HX711.h>
 #include <Wire.h> 
-//===========================Insiasi LCD==================================
+//==========================================LCD INIT====================
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 void tampilLcd(String s1, String s2="", String s3="", String s4="");
-//==============================Insiasi HX711=============================
+//==============================LCD END=================================
+//==============================hxstart=================================
 const byte hx711_data_pin = 3;    //Data pin from HX711
 const byte hx711_clock_pin = 2;   //Clock pin from HX711
 Q2HX711 hx711(hx711_data_pin, hx711_clock_pin); // prep hx711
-//===========================Inisasi Parameter============================
+
 long x1 = 8787168;//0L;
 long x0 = 0L;
 float avg_size = 4.0; // amount of averages for each mass measurement
@@ -22,7 +23,7 @@ int mode = 0;
 float oz_conversion = 0.035274;
 float mass; 
 float massaAwal =0;
-float y1 = 508.9; // calibrated mass to be added
+float y1 = 509.4; // calibrated mass to be added
 
 int jmlhJungkitan = 0; //Jumlah Jungkitan
 int hal = 0;
@@ -41,8 +42,10 @@ struct MyObject {
 };
 
 int alamatx1 = 0;
+//=======================================end hx=============================
 
-//===========================BME280====================================
+//===============================
+//BME280
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_Sensor.h>
@@ -52,7 +55,7 @@ Adafruit_BME280 bme; // I2C
 
 unsigned long delayTime;
 
-//===========================PT100======================================
+//PT100
 #include <Adafruit_MAX31865.h>
 
 // Pengunaan Pin SPI: CS, DI, DO, CLK
@@ -69,19 +72,28 @@ float SuhuUdara = 0, TekananUdara = 0, Kelembapan = 0, SuhuAir = 0;
 
 void setup() {
 
-//=============================LCD====================================
+//=============================PLXDAQ==================================
+  Serial.println("CLEARDATA");                            // Clear all Excel sheet data
+  Serial.println("LABEL,Tanggal,Waktu,Massa (g)");
+//  Serial.println("LABEL,Tanggal,Waktu,Suhu Udara (*C),Tekanan Udara (hPa),Kelembapan (%),Resistansi,Suhu Air (*C)");
+
+//=============================LCD=====================================
   lcd.begin();
   lcd.backlight();
-//==============================Loacell===============================
+//==============================Loacell================================
 PCICR |= (1 << PCIE0);              //enable PCMSK0 scan
   delay(2000);   //Waktu untuk menstabilkan loadcell
+
   
-//==============================BME280==================================
+//============================EndLoacell===============================
+  
+  //BME280
  Serial.begin(9600);
     while(!Serial);    
     Serial.println(F("BME280 test"));
  unsigned status;
     
+    // default settings
     status = bme.begin(); 
      
     // You can also pass in a Wire library object like &Wire2
@@ -101,17 +113,15 @@ PCICR |= (1 << PCIE0);              //enable PCMSK0 scan
 
     Serial.println();
 
-//==========================PT100=====================================
+    //PT100
 Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
 thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 3 kabel
 
-//=======================Inisiasi Pin=================================
   pinMode (A0, INPUT);
   pinMode (A1, INPUT);
   pinMode (A3, OUTPUT);
   digitalWrite(A3, HIGH);
 
-//=====================Hasil Kalibrasi disimpan=====================
   alamatx1 += sizeof(long);
   MyObject customVar;
   EEPROM.get(alamatx1, customVar);
@@ -154,11 +164,11 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
 
 void loop() {
   
-  AmbilDataBME280();   //Pembacaan Sensor BME280
-  AmbilDataMAX31865(); //Pembacaan Sensor PT100
-  AmbilDataLoadcell(); //Pembacaan Sesnor Loadcell
-  PengaturanAliran();  //Pengaturan Aliran Air
-  RecordSum();         //Perhitungan Rata2 Parameter Lingkungan
+  AmbilDataBME280();
+  AmbilDataMAX31865();
+  AmbilDataLoadcell();
+  PengaturanAliran();
+  RecordSum();
   //ReedSwitch();
   printAll();
 

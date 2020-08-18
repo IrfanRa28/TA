@@ -1,4 +1,3 @@
-//============================Menampilkan pada lcd==============================
 void printAll(){
   int x = analogRead(A0);
     if(x>700 && x<800){
@@ -11,6 +10,7 @@ void printAll(){
       }
       delay(500);
     }
+  
   Serial.print("Suhu Air = ");
   Serial.println(SuhuAir);
 
@@ -47,15 +47,12 @@ void printAll(){
   }
 
 }
-
-//============================BME280==================================
 void AmbilDataBME280() {
   SuhuUdara     = bme.readTemperature();
   TekananUdara  = bme.readPressure() / 100.0F;
   Kelembapan    = bme.readHumidity();
 }
 
-//==========================PT100=====================================
 void AmbilDataMAX31865(){
   
   uint16_t rtd = thermo.readRTD();
@@ -93,7 +90,6 @@ void AmbilDataMAX31865(){
 //  delay(1000); 
 }
 
-//==============================Loacell===============================
 void AmbilDataLoadcell(){
   long reading = 0;
   for (int jj=0;jj<int(avg_size);jj++)
@@ -110,9 +106,12 @@ void AmbilDataLoadcell(){
 
  mass -= tara;
  mass = abs(mass);
+
+ Serial.print("DATA,DATE,TIME,");
+ Serial.print(mass);
+ Serial.println();
 }
 
-//==============================Tare Loadcell===============================
 void Tare(){
   tampilLcd("Tare");
   x0=0L;
@@ -123,7 +122,6 @@ void Tare(){
   x0/=long(avg_size);
 }
 
-//==============================Kalibrasi Loacell===============================
 void Kalibrasi(){
   tampilLcd("Kalibrasi");
   x1 = 0L;
@@ -139,7 +137,6 @@ void Kalibrasi(){
   delay(3000);
 }
 
-////==============================Counter ReedSwitch=============================
 void ReedSwitch(){
   int RS = digitalRead(A1);
 
@@ -150,7 +147,6 @@ void ReedSwitch(){
   }
 }
 
-////==============================Pengaturan Aliran==============================
 void PengaturanAliran(){
   float selisih = massaAwal - mass;
   Serial.println(selisih);
@@ -184,7 +180,6 @@ void PengaturanAliran(){
   }
 }
 
-//==============================Perhitungan Rata2 Parameter Lingkungan============================
 void RecordSum(){
   int Nw = millis();
   if((Nw-lsNow)<0){
