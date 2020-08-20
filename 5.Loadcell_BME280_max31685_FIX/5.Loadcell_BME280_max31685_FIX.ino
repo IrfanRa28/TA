@@ -16,13 +16,13 @@ Q2HX711 hx711(hx711_data_pin, hx711_clock_pin); // prep hx711
 //===========================Inisasi Parameter============================
 long x1 = 8787168;//0L;
 long x0 = 0L;
-float avg_size = 4.0; // amount of averages for each mass measurement
+float avg_size = 12.0; // amount of averages for each mass measurement
 float tara = 0;
 int mode = 0;
 float oz_conversion = 0.035274;
 float mass; 
 float massaAwal =0;
-float y1 = 508.9; // calibrated mass to be added
+float y1 = 509.4; // calibrated mass to be added
 
 int jmlhJungkitan = 0; //Jumlah Jungkitan
 int hal = 0;
@@ -68,12 +68,15 @@ float SuhuUdara = 0, TekananUdara = 0, Kelembapan = 0, SuhuAir = 0;
 
 
 void setup() {
+//=============================PLXDAQ==================================
+  Serial.println("CLEARDATA");                            // Clear all Excel sheet data
+  Serial.println("LABEL,Tanggal,Waktu,Massa (g)");
 
 //=============================LCD====================================
   lcd.begin();
   lcd.backlight();
 //==============================Loacell===============================
-PCICR |= (1 << PCIE0);              //enable PCMSK0 scan
+  PCICR |= (1 << PCIE0);              //enable PCMSK0 scan
   delay(2000);   //Waktu untuk menstabilkan loadcell
   
 //==============================BME280==================================
