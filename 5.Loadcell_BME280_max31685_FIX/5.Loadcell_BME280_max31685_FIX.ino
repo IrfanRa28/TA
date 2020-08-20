@@ -16,7 +16,7 @@ Q2HX711 hx711(hx711_data_pin, hx711_clock_pin); // prep hx711
 //===========================Inisasi Parameter============================
 long x1 = 8787168;//0L;
 long x0 = 0L;
-float avg_size = 12.0; // amount of averages for each mass measurement
+float avg_size = 15.0; // amount of averages for each mass measurement
 float tara = 0;
 int mode = 0;
 float oz_conversion = 0.035274;
