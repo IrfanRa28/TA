@@ -11,9 +11,9 @@ void printAll(){
       }
       delay(500);
     }
-    if(x<5){
-      initial();
-    }
+//    if(x<5){
+//      initial();
+//    }
   Serial.print("Suhu Air = ");
   Serial.println(SuhuAir);
 
