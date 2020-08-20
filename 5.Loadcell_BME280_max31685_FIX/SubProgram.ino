@@ -110,6 +110,10 @@ void AmbilDataLoadcell(){
 
  mass -= tara;
  mass = abs(mass);
+
+ Serial.print("DATA,DATE,TIME,");
+ Serial.print(mass);
+ Serial.println();
 }
 
 //==============================Tare Loadcell===============================
