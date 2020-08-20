@@ -120,36 +120,36 @@ thermo.begin(MAX31865_3WIRE);  // '3WIRE" karena PT100 yang digunakan hanya ada 
   EEPROM.get(alamatx1, customVar);
   Tare();
   x1 = customVar.x1;
-  
-  while(true){
-    AmbilDataLoadcell();
-    int x = analogRead(A0);
-    if (x<5){
-      tampilLcd("Sistem Dimulai");
-      Running = true;
-      digitalWrite(A3, LOW);
-      massaAwal = mass;
-      break;
-    }
-    else if (x<520){
-      Tare(); 
-    }
-    else if (x<700){
-      Kalibrasi();
-    }
-    else{
-      Serial.println("Massa kurang dari 400");
-      lcd.clear();
-       lcd.setCursor(5, 0);
-       lcd.print("Kalibrator");
-       lcd.setCursor(5, 1);
-       lcd.print("Rain Gauge");
-       lcd.setCursor(0, 2);
-       lcd.print("");
-       lcd.setCursor(0, 3);
-       lcd.print("Massa : " + (String)mass);
-    }
-  }
+  initial();
+//  while(true){
+//    AmbilDataLoadcell();
+//    int x = analogRead(A0);
+//    if (x<5){
+//      tampilLcd("Sistem Dimulai");
+//      Running = true;
+//      digitalWrite(A3, LOW);
+//      massaAwal = mass;
+//      break;
+//    }
+//    else if (x<520){
+//      Tare(); 
+//    }
+//    else if (x<700){
+//      Kalibrasi();
+//    }
+//    else{
+//      Serial.println("Massa kurang dari 400");
+//      lcd.clear();
+//       lcd.setCursor(5, 0);
+//       lcd.print("Kalibrator");
+//       lcd.setCursor(5, 1);
+//       lcd.print("Rain Gauge");
+//       lcd.setCursor(0, 2);
+//       lcd.print("");
+//       lcd.setCursor(0, 3);
+//       lcd.print("Massa : " + (String)mass);
+//    }
+//  }
 
     
 }
